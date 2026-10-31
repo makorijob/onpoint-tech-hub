@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OnPoint Tech Hub</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f2f4f7;--card:#fff;--ink:#14202e;--mut:#66758a;--line:#dde3ea;--acc:#e0701c;--teal:#0f766e;--bad:#c0392b;--ok:#1e8e4e;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1620;--card:#162230;--ink:#e7edf4;--mut:#93a3b8;--line:#263548;--acc:#f0903f;--teal:#38b2a6;--bad:#ef7b6d;--ok:#52c27f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1620;--card:#162230;--ink:#e7edf4;--mut:#93a3b8;--line:#263548;--acc:#f0903f;--teal:#38b2a6;--bad:#ef7b6d;--ok:#52c27f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{background:var(--ink);color:var(--bg);padding:12px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+header h1{margin:0;font-size:18px;font-weight:800;letter-spacing:-.01em;flex:1;min-width:150px}
+header h1 span{color:var(--acc)}
+select,input,button{font:inherit;color:inherit}
+select,input{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;max-width:100%}
+header select{background:transparent;color:var(--bg);border-color:#ffffff40}
+header select option{color:#14202e}
+nav{display:flex;gap:4px;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--line);padding:6px 10px;position:sticky;top:calc(56px + env(safe-area-inset-top,0px));z-index:4}
+nav button{background:none;border:0;padding:9px 14px;border-radius:8px;font-weight:600;color:var(--mut);cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--ink);color:var(--bg)}
+main{padding:14px;max-width:1100px;margin:auto}
+.grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;overflow-x:auto}
+.card h3{margin:0 0 8px;font-size:15px}
+.big{font-size:26px;font-weight:800;letter-spacing:-.02em}
+.mut{color:var(--mut);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+th{color:var(--mut);font-weight:600;font-size:13px}
+td.n,th.n{text-align:right}
+.btn{background:var(--teal);color:#fff;border:0;border-radius:8px;padding:9px 14px;font-weight:700;cursor:pointer}
+.btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.acc{background:var(--acc);color:#1a1005}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn:focus-visible,nav button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.item{display:flex;justify-content:space-between;gap:8px;width:100%;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:6px;cursor:pointer}
+.item b{font-weight:600}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tabs button{flex:1;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--card);font-weight:700;cursor:pointer}
+.tabs button.on{background:var(--acc);color:#1a1005;border-color:var(--acc)}
+.two{display:grid;gap:12px;grid-template-columns:1.3fr 1fr}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700;background:var(--bg);border:1px solid var(--line)}
+.low{color:var(--bad)}.good{color:var(--ok)}
+.bar{height:10px;border-radius:5px;background:var(--bg);overflow:hidden;margin:4px 0 10px}
+.bar i{display:block;height:100%;background:var(--teal)}
+.rcpt{border:1px dashed var(--mut);border-radius:8px;padding:12px;margin-top:10px;font-family:ui-monospace,Menlo,monospace;font-size:13px;white-space:pre-wrap}
+.note{background:var(--bg);border-left:4px solid var(--acc);padding:8px 12px;border-radius:6px;margin:8px 0}
+#toast{display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));color:#fff;padding:10px 16px;border-radius:10px;z-index:20;max-width:90%;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <h1>OnPoint <span>Tech Hub</span></h1>
+  <label class="mut" style="color:inherit">Branch <select id="br" onchange="S.branch=this.value;cart=[];render()"></select></label>
+  <span id="who" style="font-size:13px"></span>
+</header>
+<nav>
+  <button data-v="dash" onclick="go('dash')">Dashboard</button>
+  <button data-v="sell" onclick="go('sell')">Sell</button>
+  <button data-v="gas" onclick="go('gas')">Gas</button>
+  <button data-v="elec" onclick="go('elec')">Electronics</button>
+  <button data-v="cyber" onclick="go('cyber')">Cyber services</button>
+  <button data-v="customers" onclick="go('customers')">Customers and debts</button>
+  <button data-v="admin" onclick="go('admin')">Expenses and stock</button>
+  <button data-v="audit" onclick="go('audit')">Audit and staff</button>
+  <button data-v="settings" onclick="go('settings')">Settings</button>
+</nav>
+<main id="app"></main>
+<div id="toast" role="status"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const BR=['Maseno','Kisumu','Nairobi'];
+const ST=['Received','In repair','Ready','Collected'];
+const $=s=>document.querySelector(s);
+const fmt=n=>'KES '+Math.round(n).toLocaleString();
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const st3=(a,b,c)=>({Maseno:a,Kisumu:b,Nairobi:c});
+
+const ROLES={Owner:['dash','sell','gas','elec','cyber','customers','admin','audit','settings'],Manager:['dash','sell','gas','elec','cyber','customers','admin'],Cashier:['sell','gas','cyber','customers'],Technician:['elec']};
+let S={branch:'Kisumu',rate:0,tank:{},gasStock:{Maseno:{},Kisumu:{},Nairobi:{}},services:[],products:[],cyl:[],sales:[],repairs:[],expenses:[],audit:[],users:[]},view='dash',cart=[],line='cyber',last=null,lastId='',note='',cust='',pay='Cash',disc=0,ref='',me=null;
+const B=()=>S.branch;
+const cyl=id=>S.cyl.find(c=>c.id===id);
+const cname=c=>c.brand+' '+c.size+'kg';
+function go(v){view=v;note='';render()}
+function loginView(){
+  return `<div class="card" style="max-width:400px;margin:40px auto"><h3 style="font-size:20px">Staff sign in</h3><div class="row"><select id="lu" style="flex:1">${PUB.map(u=>`<option value="${u.id}">${esc(u.name)} - ${u.role}${u.b!=='All'?' ('+u.b+')':''}</option>`).join('')}</select></div>
+  <div class="row"><input id="lp" type="password" inputmode="numeric" placeholder="PIN" style="flex:1" onkeydown="if(event.key==='Enter')login()"><button class="btn" onclick="login()">Sign in</button></div>${note?`<div class="note">${note}</div>`:''}
+  <div class="mut">Forgot your PIN? Ask the owner to reset it.</div></div>`;
+}
+function audit(){
+  return `<div class="card"><h3>Staff and PINs</h3><table>${S.users.map(u=>`<tr><td>${esc(u.name)}</td><td>${u.role}</td><td>${u.b}</td><td><input type="password" inputmode="numeric" maxlength="6" placeholder="New PIN" id="pin${u.id}" style="width:110px"> <button class="btn sm sec" onclick="setPin(${u.id})">Change PIN</button></td></tr>`).join('')}</table>${note?`<div class="note">${note}</div>`:''}
+  <div class="mut">Cashiers can give at most 5% discount and cannot edit prices. Technicians only see repairs.</div></div>
+  <div class="card" style="margin-top:12px"><h3>Audit log (latest 60)</h3><table><tr><th>Time</th><th>User</th><th>Branch</th><th>Action</th></tr>${S.audit.slice(-60).reverse().map(a=>`<tr><td>${new Date(a.t).toLocaleString()}</td><td>${esc(a.u)}</td><td>${a.b}</td><td>${esc(a.a)}</td></tr>`).join('')}</table></div>`;
+}
+function wa(r){
+  let p=String(r.phone).replace(/\D/g,'');if(p.startsWith('0'))p='254'+p.slice(1);
+  return 'https://wa.me/'+p+'?text='+encodeURIComponent('Hello '+r.cust+', your '+r.device+' (job '+r.no+') is ready for collection at OnPoint Tech Hub '+r.b+'. Balance due: KES '+((r.est||0)-(r.dep||0))+'. Please bring your claim slip and ID.');
+}
+function today(s){return new Date(s.t).toDateString()===new Date().toDateString()}
+
+/* ---------- Dashboard ---------- */
+function dash(){
+  const ts=S.sales.filter(today),sum=a=>a.reduce((x,y)=>x+y.total,0);
+  const lines=['Cyber','Electronics','Gas'];
+  const days=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()-6+i);return d}),dv=days.map(d=>sum(S.sales.filter(s=>new Date(s.t).toDateString()===d.toDateString()))),mx=Math.max(1,...dv);
+  const by=(b,l)=>ts.filter(s=>s.b===b).reduce((t,s)=>t+s.items.filter(i=>i.ln===l).reduce((x,i)=>x+i.p*i.q,0),0);
+  const pays=['Cash','M-Pesa','Credit'].map(p=>[p,sum(ts.filter(s=>s.pay===p))]);
+  const max=Math.max(1,...pays.map(p=>p[1]));
+  const low=S.products.filter(p=>p.stock[B()]<=3);
+  const lowG=S.cyl.filter(c=>S.gasStock[B()][c.id].full<=3);
+  const open=S.repairs.filter(r=>r.status!=='Collected');
+  return `<div class="grid">
+  <div class="card"><div class="mut">Today, all branches</div><div class="big">${fmt(sum(ts))}</div><div class="mut">${ts.length} sales</div></div>
+  <div class="card"><div class="mut">Today, ${B()}</div><div class="big">${fmt(sum(ts.filter(s=>s.b===B())))}</div><div class="mut">${ts.filter(s=>s.b===B()).length} sales</div></div>
+  <div class="card"><div class="mut">Open repairs</div><div class="big">${open.length}</div><div class="mut">${open.filter(r=>r.status==='Ready').length} ready for pickup</div></div>
+  <div class="card"><div class="mut">Lifetime sales logged</div><div class="big">${fmt(sum(S.sales))}</div><div class="mut">${S.sales.length} receipts</div></div></div>
+  <div class="grid" style="margin-top:12px">
+  <div class="card"><h3>Today by branch and service</h3><table><tr><th>Branch</th>${lines.map(l=>`<th class="n">${l}</th>`).join('')}</tr>
+  ${BR.map(b=>`<tr><td>${b}</td>${lines.map(l=>`<td class="n">${fmt(by(b,l))}</td>`).join('')}</tr>`).join('')}</table></div>
+  <div class="card"><h3>Payment split today</h3>${pays.map(p=>`<div class="row" style="justify-content:space-between;margin:0"><span>${p[0]}</span><b>${fmt(p[1])}</b></div><div class="bar"><i style="width:${p[1]/max*100}%"></i></div>`).join('')}</div>
+  <div class="card"><h3>Needs attention in ${B()}</h3>
+  ${low.map(p=>`<div class="low">Low stock: ${esc(p.name)} (${p.stock[B()]} left)</div>`).join('')}
+  ${lowG.map(c=>`<div class="low">Low gas: ${cname(c)} (${S.gasStock[B()][c.id].full} full)</div>`).join('')}
+  ${open.filter(r=>r.status==='Ready').map(r=>`<div>Ready: ${esc(r.device)} for ${esc(r.cust)}</div>`).join('')}
+  ${!low.length&&!lowG.length&&!open.length?'<div class="mut">All clear.</div>':''}</div></div>
+  <div class="card" style="margin-top:12px"><h3>Sales, last 7 days (all branches)</h3><div style="display:flex;align-items:flex-end;gap:8px;height:125px">${dv.map((v,i)=>`<div style="flex:1;text-align:center"><div class="mut" style="font-size:11px">${v?Math.round(v/1000*10)/10+'k':''}</div><div style="background:var(--teal);height:${Math.max(3,v/mx*85)}px;border-radius:4px 4px 0 0"></div><div class="mut">${days[i].toLocaleDateString(undefined,{weekday:'short'})}</div></div>`).join('')}</div></div>
+  <div class="card" style="margin-top:12px"><h3>Recent sales</h3>${S.sales.length?`<table><tr><th>Receipt</th><th>Branch</th><th>Items</th><th>Pay</th><th class="n">Total</th></tr>
+  ${S.sales.slice(-8).reverse().map(s=>`<tr><td>${s.id}</td><td>${s.b}</td><td>${esc(s.items.map(i=>i.n+' x'+i.q).join(', ').slice(0,50))}</td><td>${s.pay}</td><td class="n">${fmt(s.total)}</td></tr>`).join('')}</table>`:'<div class="mut">No sales yet. Open Sell to record the first one.</div>'}
+  </div>`;
+}
+
+/* ---------- Sell ---------- */
+function items(){
+  if(line==='cyber')return S.services.map(s=>({k:'s'+s.id,n:s.name,p:s.price,ln:'Cyber'}));
+  if(line==='elec')return S.products.filter(p=>p.stock[B()]>0).map(p=>({k:'p'+p.id,n:p.name,p:p.price,ln:'Electronics',t:'p',ref:p.id}));
+  return [{k:'gr',n:'Gas refill (per kg)',p:S.rate,ln:'Gas',t:'r'},
+   ...S.cyl.map(c=>({k:'x'+c.id,n:'Exchange '+cname(c),p:c.exch,ln:'Gas',t:'x',ref:c.id})),
+   ...S.cyl.map(c=>({k:'c'+c.id,n:'Complete '+cname(c)+' (cylinder + gas)',p:c.comp,ln:'Gas',t:'c',ref:c.id}))];
+}
+function sell(){
+  const sub=cart.reduce((t,c)=>t+c.p*c.q,0),total=Math.max(0,sub-disc);
+  return `<div class="two"><div class="card"><div class="tabs">${[['cyber','Cyber'],['elec','Electronics'],['gas','Gas']].map(t=>`<button class="${line===t[0]?'on':''}" onclick="line='${t[0]}';render()">${t[1]}</button>`).join('')}</div>
+  ${items().map(i=>`<button class="item" onclick="add('${i.k}')"><b>${esc(i.n)}</b><span>${fmt(i.p)}</span></button>`).join('')}</div>
+  <div class="card"><h3>Sale at ${B()}</h3>
+  ${cart.length?`<table>${cart.map((c,i)=>`<tr><td>${esc(c.n)}</td><td><button class="btn sec sm" onclick="qty(${i},-1)">-</button> ${c.q} <button class="btn sec sm" onclick="qty(${i},1)">+</button></td><td class="n">${fmt(c.p*c.q)}</td></tr>`).join('')}</table>`:'<div class="mut">Tap an item to add it. For gas refills, the quantity is kilograms.</div>'}
+  <div class="row" style="justify-content:space-between;margin-bottom:0"><span class="mut">Subtotal ${fmt(sub)}</span><span class="mut">VAT 16% incl. ${fmt(total-total/1.16)}</span></div><div class="big" style="margin:4px 0 10px">${fmt(total)}</div>
+  <div class="row"><select onchange="pay=this.value;render()">${['Cash','M-Pesa','Credit'].map(p=>`<option ${p===pay?'selected':''}>${p}</option>`).join('')}</select>
+  <input placeholder="Customer phone (optional)" value="${esc(cust)}" oninput="cust=this.value" style="flex:1"></div>
+  <div class="row"><input type="number" min="0" placeholder="Discount KES" value="${disc||''}" style="width:130px" onchange="disc=Math.min(+this.value||0,${me.role==='Cashier'?Math.round(sub*0.05):sub});render()"><input placeholder="M-Pesa code (required for M-Pesa)" value="${esc(ref)}" oninput="ref=this.value.toUpperCase()" style="flex:1"></div>
+  ${pay==='M-Pesa'?`<div class="row"><button class="btn acc sm" onclick="stk2(${total})">Send M-Pesa prompt to customer</button><span class="mut">${esc(mp.msg)}</span></div>`:''}
+  <div class="row"><button class="btn" onclick="done()" ${cart.length?'':'disabled'}>Complete sale</button><button class="btn sec" onclick="cart=[];render()">Clear</button></div>
+  ${note?`<div class="note">${note}</div>`:''}
+  ${last?`<div class="rcpt">${last}</div><div class="row"><button class="btn sec sm" onclick="window.print()">Print receipt</button> <button class="btn sec sm" onclick="salePdf('${lastId}')">Download PDF receipt</button></div>`:''}</div></div>`;
+}
+function add(k){
+  const it=items().find(x=>x.k===k),e=cart.find(c=>c.k===k);
+  if(e)e.q++;else cart.push({...it,q:1});render();
+}
+function qty(i,d){cart[i].q+=d;if(cart[i].q<=0)cart.splice(i,1);render()}
+
+/* ---------- Gas ---------- */
+function gas(){
+  const b=B(),g=S.gasStock[b],sold=S.sales.filter(s=>s.b===b&&today(s)).reduce((t,s)=>t+s.items.filter(i=>i.n.startsWith('Gas refill')).reduce((x,i)=>x+i.q,0),0);
+  return `<div class="grid"><div class="card"><div class="mut">Bulk tank, ${b}</div><div class="big">${S.tank[b]} kg</div><div class="mut">Refilled today: ${sold} kg</div>
+  <div class="row"><button class="btn sm" onclick="tankAdd(100)">+100 kg delivery</button></div></div>
+  <div class="card"><h3>Tank check</h3><div class="mut">Enter the measured kg to find leakage or loss.</div><div class="row"><input id="meas" type="number" placeholder="Measured kg" style="width:130px"><button class="btn sm" onclick="check()">Check</button></div><div id="var"></div></div>
+  <div class="card"><h3>Refill price per kg</h3><input type="number" value="${S.rate}" style="width:110px" onchange="setRate(this.value)"><div class="mut">Used on the Sell screen.</div></div></div>
+  <div class="card" style="margin-top:12px"><h3>Cylinder stock, ${b}</h3><table><tr><th>Cylinder</th><th class="n">Full</th><th class="n">Empty</th><th class="n">Exchange</th><th class="n">Complete</th><th></th></tr>
+  ${S.cyl.map(c=>`<tr><td>${cname(c)}</td><td class="n ${g[c.id].full<=3?'low':''}">${g[c.id].full}</td><td class="n">${g[c.id].empty}</td><td class="n">${fmt(c.exch)}</td><td class="n">${fmt(c.comp)}</td>
+  <td><button class="btn sm sec" onclick="rf('${c.id}')">Refill empties</button> <button class="btn sm sec" onclick="gasAdd('${c.id}',6)">+6 from supplier</button></td></tr>`).join('')}</table>
+  <div class="mut" style="margin-top:8px">Refill empties sends all empties to the supplier and receives them back full. Exchange sales add an empty and remove a full cylinder.</div></div>`;
+}
+function check(){
+  const m=parseFloat($('#meas').value);if(isNaN(m))return;
+  const v=S.tank[B()]-m;
+  $('#var').innerHTML=Math.abs(v)<=2?`<div class="good">Within tolerance (${v.toFixed(1)} kg).</div>`:`<div class="low">Variance ${v.toFixed(1)} kg. Check for leaks, unrecorded sales or theft.</div>`;
+}
+
+/* ---------- Electronics ---------- */
+function elec(){
+  const b=B();
+  return `<div class="card"><h3>Stock, ${b}</h3><table><tr><th>Item</th><th class="n">Cost</th><th class="n">Price</th><th class="n">Margin</th><th class="n">Stock</th><th></th></tr>
+  ${S.products.map(p=>`<tr><td>${esc(p.name)}</td><td class="n">${fmt(p.cost)}</td><td class="n">${fmt(p.price)}</td><td class="n">${Math.round((p.price-p.cost)/p.price*100)}%</td><td class="n ${p.stock[b]<=3?'low':''}">${p.stock[b]}</td>
+  <td><button class="btn sm sec" onclick="stk(${p.id},5)">+5</button> <button class="btn sm sec" onclick="stk(${p.id},-1)">-1</button></td></tr>`).join('')}</table>
+  <div class="row"><input id="pn" placeholder="New item name"><input id="pc" type="number" placeholder="Cost" style="width:90px"><input id="pp" type="number" placeholder="Price" style="width:90px"><input id="ps" type="number" placeholder="Qty" style="width:70px"><button class="btn sm" onclick="addP()">Add item</button></div></div>
+  ${repairDesk()}`;
+}
+const ACC=['Charger','Battery','SIM card','Memory card','Case/cover','Bag'];
+function repairDesk(){
+  const b=B(),L=S.repairs.filter(r=>r.b===b).slice().reverse();
+  const f=(id,ph,w)=>`<input id="${id}" placeholder="${ph}" style="flex:1;min-width:${w||140}px">`;
+  return `<div class="card" style="margin-top:12px"><h3>New repair job card, ${b}</h3>
+  <div class="row">${f('j_c','Customer name *')}${f('j_p','Phone *')}${f('j_id','ID number')}</div>
+  <div class="row"><select id="j_t">${['Phone','Laptop','TV','Tablet','Printer','Other'].map(t=>`<option>${t}</option>`).join('')}</select>${f('j_m','Brand and model *')}${f('j_s','IMEI / serial number')}${f('j_col','Colour',90)}</div>
+  <div class="row">${f('j_f','Reported fault *',220)}${f('j_cond','Condition on arrival (cracks, dents)',220)}</div>
+  <div class="row"><span class="mut">Items left:</span>${ACC.map(a=>`<label><input type="checkbox" class="j_a" value="${a}"> ${a}</label>`).join(' ')}</div>
+  <div class="row">${f('j_pw','Screen lock / PIN (optional)',120)}<input id="j_e" type="number" placeholder="Estimate KES" style="width:120px"><input id="j_d" type="number" placeholder="Deposit KES" style="width:120px"><input id="j_dt" type="date" title="Expected ready date"><input id="j_tech" placeholder="Technician" style="width:130px"></div>
+  <div class="row"><button class="btn" onclick="addR()">Save job card</button></div>${note?`<div class="note">${note}</div>`:''}</div>
+  <div class="card" style="margin-top:12px"><h3>Repair jobs, ${b}</h3>${L.length?`<table><tr><th>Job</th><th>Customer</th><th>Device</th><th>Status</th><th class="n">Balance</th><th>PDF</th><th></th></tr>${L.map(r=>`<tr><td>${r.no||'-'}</td><td>${esc(r.cust)}<div class="mut">${esc(r.phone)}</div></td><td>${esc(r.device)}<div class="mut">${esc(r.issue)}</div></td><td><span class="tag">${r.status}</span></td><td class="n">${fmt((r.est||0)-(r.dep||0))}</td>
+  <td>${r.status==='Ready'?`<a class="btn sm acc" style="text-decoration:none;display:inline-block" target="_blank" rel="noopener" href="${wa(r)}">WhatsApp customer</a> `:''}<button class="btn sm sec" onclick="jobPdf(${r.id},'shop')">Shop copy</button> <button class="btn sm sec" onclick="jobPdf(${r.id},'client')">Client copy</button></td>
+  <td>${r.status!=='Collected'?`<button class="btn sm" onclick="adv(${r.id})">Mark ${ST[ST.indexOf(r.status)+1].toLowerCase()}</button>`:''}</td></tr>`).join('')}</table>`:'<div class="mut">No repair jobs at this branch yet.</div>'}</div>`;
+}
+function jobPdf(id,who){
+  const r=S.repairs.find(x=>x.id===id),{jsPDF}=window.jspdf,d=new jsPDF({unit:'mm',format:'a4'}),shop=who==='shop',est=r.est||0,dep=r.dep||0;let y=18;
+  d.setFont('helvetica','bold');d.setFontSize(20);d.text('ONPOINT TECH HUB',15,y);d.setFontSize(11);d.text(shop?'SHOP COPY':'CUSTOMER COPY',195,y,{align:'right'});y+=7;
+  d.setFont('helvetica','normal');d.setFontSize(10);d.text('Repair job card  |  '+r.b+' branch',15,y);y+=4;d.setLineWidth(.6);d.line(15,y,195,y);y+=9;
+  d.setFont('helvetica','bold');d.setFontSize(15);d.text(r.no||'',15,y);d.setFontSize(10);d.setFont('helvetica','normal');d.text('Received '+new Date(r.t||Date.now()).toLocaleString(),195,y,{align:'right'});y+=9;
+  const kv=(k,v)=>{const t=d.splitTextToSize(String(v||'-'),130);d.setFont('helvetica','bold');d.text(k,15,y);d.setFont('helvetica','normal');d.text(t,62,y);y+=Math.max(7,t.length*5+2)};
+  kv('Customer',r.cust);kv('Phone',r.phone);kv('ID number',r.idno);kv('Device',(r.type||'')+': '+r.device);kv('IMEI / serial',r.serial);kv('Colour',r.colour);
+  kv('Reported fault',r.issue);kv('Condition on arrival',r.cond);kv('Items left with us',(r.acc||[]).join(', '));
+  if(shop)kv('Screen lock / PIN',r.pw);
+  kv('Technician',r.tech);kv('Expected ready',r.due);
+  y+=1;d.line(15,y,195,y);y+=7;
+  kv('Estimate','KES '+est.toLocaleString());kv('Deposit paid','KES '+dep.toLocaleString());kv('Balance due','KES '+(est-dep).toLocaleString());
+  y+=1;d.line(15,y,195,y);y+=7;
+  if(shop){d.setFont('helvetica','bold');d.text('Technician notes and parts used',15,y);for(let i=0;i<4;i++){y+=8;d.line(15,y,195,y)}}
+  else{
+    const T=['1. Keep this slip. A device is released only against this slip and a valid ID.','2. The estimate may change. We will call you before doing extra work.','3. We are not responsible for data loss. Back up your data before repair.','4. Devices not collected within 30 days of the ready notice may be sold to recover costs.','5. Repair work carries a 7 day warranty. It does not cover liquid or physical damage.'];
+    d.setFont('helvetica','bold');d.text('Terms',15,y);y+=5;d.setFont('helvetica','normal');d.setFontSize(9);
+    T.forEach(t=>{const l=d.splitTextToSize(t,175);d.text(l,15,y);y+=l.length*4+1.5});d.setFontSize(10);
+  }
+  y=Math.max(y+14,250);d.line(15,y,85,y);d.line(125,y,195,y);y+=5;d.setFontSize(9);d.text('Customer signature and date',15,y);d.text('Received by (staff) and date',125,y);
+  saveFile((r.no||'job')+'-'+who+'-copy.pdf',d.output('arraybuffer'));
+}
+function salePdf(id){
+  const s=S.sales.find(x=>x.id===id);if(!s)return;
+  const {jsPDF}=window.jspdf,d=new jsPDF({unit:'mm',format:[80,70+s.items.length*14]});let y=10;
+  d.setFont('helvetica','bold');d.setFontSize(13);d.text('ONPOINT TECH HUB',40,y,{align:'center'});y+=5;
+  d.setFont('helvetica','normal');d.setFontSize(8);d.text(s.b+' branch',40,y,{align:'center'});y+=4;d.text(s.id+'  '+new Date(s.t).toLocaleString(),40,y,{align:'center'});y+=7;
+  s.items.forEach(i=>{const l=d.splitTextToSize(i.n,70);d.text(l,5,y);y+=4*l.length;d.text(i.q+' x '+i.p,5,y);d.text(String(i.q*i.p),75,y,{align:'right'});y+=6});
+  d.line(5,y,75,y);y+=5;d.setFont('helvetica','bold');d.setFontSize(10);d.text('TOTAL KES '+s.total.toLocaleString(),5,y);y+=5;
+  d.setFont('helvetica','normal');d.setFontSize(8);d.text('VAT 16% incl. KES '+Math.round(s.total-s.total/1.16).toLocaleString()+(s.disc?'   Discount KES '+s.disc:''),5,y);y+=4;d.text('Paid by '+s.pay+(s.ref?' ('+s.ref+')':''),5,y);y+=7;d.text('Thank you for choosing OnPoint',40,y,{align:'center'});
+  saveFile(s.id+'-receipt.pdf',d.output('arraybuffer'));
+}
+
+/* ---------- Customers and debts ---------- */
+function customers(){
+  const m={},mk=p=>m[p]=m[p]||{ph:p,n:'',v:0,sp:0,l:''};
+  S.sales.forEach(s=>{if(!s.cust)return;const c=mk(s.cust);c.v++;c.sp+=s.total;if(s.t>c.l)c.l=s.t});
+  S.repairs.forEach(r=>{const c=mk(r.phone);c.n=r.cust;c.v++;if((r.t||'')>c.l)c.l=r.t||''});
+  const L=Object.values(m).sort((a,b)=>b.sp-a.sp),D=S.sales.filter(s=>s.pay==='Credit'&&!s.settled);
+  return `<div class="card"><h3>Unpaid credit sales</h3>${D.length?`<table><tr><th>Receipt</th><th>Customer</th><th>Branch</th><th class="n">Amount</th><th></th></tr>${D.map(s=>`<tr><td>${s.id}</td><td>${esc(s.cust||'Walk-in')}</td><td>${s.b}</td><td class="n">${fmt(s.total)}</td><td><button class="btn sm" onclick="settle('${s.id}')">Mark paid</button></td></tr>`).join('')}</table>`:'<div class="mut">No unpaid credit sales. Enter a phone number on the Sell screen to track who owes you.</div>'}</div>
+  <div class="card" style="margin-top:12px"><h3>Customer directory</h3>${L.length?`<table><tr><th>Phone</th><th>Name</th><th class="n">Visits</th><th class="n">Spent</th><th>Last visit</th></tr>${L.map(c=>`<tr><td>${esc(c.ph)}</td><td>${esc(c.n||'-')}</td><td class="n">${c.v}</td><td class="n">${fmt(c.sp)}</td><td>${c.l?new Date(c.l).toLocaleDateString():'-'}</td></tr>`).join('')}</table>`:'<div class="mut">Customers appear here once a sale or repair has a phone number.</div>'}</div>`;
+}
+
+/* ---------- Expenses, transfers, backup ---------- */
+function admin(){
+  const b=B(),ex=S.expenses.filter(e=>e.b===b).slice().reverse(),tot=x=>x.reduce((t,e)=>t+e.amt,0);
+  const net=BR.map(n=>{const s=tot(S.sales.filter(x=>x.b===n).map(x=>({amt:x.total}))),e=tot(S.expenses.filter(x=>x.b===n));return `<tr><td>${n}</td><td class="n">${fmt(s)}</td><td class="n">${fmt(e)}</td><td class="n ${s-e<0?'low':'good'}">${fmt(s-e)}</td></tr>`}).join('');
+  return `<div class="grid"><div class="card"><h3>Branch results</h3><table><tr><th>Branch</th><th class="n">Sales</th><th class="n">Expenses</th><th class="n">Net</th></tr>${net}</table></div>
+  <div class="card"><h3>Add expense, ${b}</h3><div class="row"><select id="x_c">${['Rent','Electricity','Salaries','Transport','Stock purchase','Airtime and internet','Other'].map(c=>`<option>${c}</option>`).join('')}</select><input id="x_a" type="number" placeholder="Amount" style="width:110px"><input id="x_n" placeholder="Note" style="flex:1"><button class="btn sm" onclick="addX()">Save expense</button></div>
+  ${ex.slice(0,6).map(e=>`<div class="row" style="justify-content:space-between;margin:2px 0"><span>${esc(e.c)} ${esc(e.n)}</span><b>${fmt(e.amt)}</b></div>`).join('')||'<div class="mut">No expenses recorded here yet.</div>'}</div>
+  <div class="card"><h3>Transfer stock out of ${b}</h3><div class="row"><select id="t_p">${S.products.map(p=>`<option value="${p.id}">${esc(p.name)} (${p.stock[b]})</option>`).join('')}</select><select id="t_to">${BR.filter(x=>x!==b).map(x=>`<option>${x}</option>`).join('')}</select><input id="t_q" type="number" value="1" style="width:70px"><button class="btn sm" onclick="xfer()">Move stock</button></div>${note?`<div class="note">${note}</div>`:''}</div>
+  <div class="card"><h3>Reports and backup</h3><div class="row"><button class="btn sm sec" onclick="csv()">Download sales CSV</button></div><div class="mut">Data is stored securely on the server database.</div></div></div>`;
+}
+function csv(){
+  const rows=[['Receipt','Date','Branch','Items','Payment','Total']].concat(S.sales.map(s=>[s.id,s.t,s.b,s.items.map(i=>i.n+' x'+i.q).join('; '),s.pay,s.total]));
+  saveFile('onpoint-sales.csv',rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'));
+}
+
+/* ---------- Cyber ---------- */
+function cyber(){
+  return `<div class="card"><h3>Service price list</h3><div class="mut">Edit a price and it updates on the Sell screen. Prices apply to all branches.</div>
+  <table>${S.services.map(s=>`<tr><td>${esc(s.name)}</td><td class="n"><input type="number" value="${s.price}" style="width:90px" onchange="priceSet(${s.id},this.value)" ${['Owner','Manager'].includes(me.role)?'':'disabled'}></td></tr>`).join('')}</table>
+  <div class="row"><input id="sn" placeholder="New service name" style="flex:1"><input id="sp" type="number" placeholder="Price" style="width:90px"><button class="btn sm" onclick="addS()">Add service</button></div></div>`;
+}
+
+function render(){
+  document.querySelector('nav').style.display=me?'':'none';
+  $('#who').innerHTML=me?esc(me.name)+' ('+me.role+') <button class="btn sec sm" style="color:inherit;border-color:#ffffff50" onclick="logout()">Log out</button>':'';
+  if(!me){$('#app').innerHTML=loginView();return}
+  if(!ROLES[me.role].includes(view))view=ROLES[me.role][0];
+  $('#br').innerHTML=BR.map(b=>`<option ${b===S.branch?'selected':''}>${b}</option>`).join('');
+  $('#app').innerHTML=({dash,sell,gas,elec,cyber,customers,admin,audit,settings})[view]();
+  document.querySelectorAll('nav button').forEach(b=>{b.classList.toggle('on',b.dataset.v===view);b.style.display=ROLES[me.role].includes(b.dataset.v)?'':'none'});
+  $('#br').disabled=me.b!=='All';
+}
+/* ---------- Server connection ---------- */
+let TOKEN=null,PUB=[],mp={id:'',msg:'',status:''},MPS=null,tt;
+function toast(m,err){const t=$('#toast');t.textContent=m;t.style.background=err?'var(--bad)':'var(--ink)';t.style.display='block';clearTimeout(tt);tt=setTimeout(()=>t.style.display='none',4500)}
+async function api(m,p,b){
+  const r=await fetch('/api'+p,{method:m,headers:{'Content-Type':'application/json',...(TOKEN?{Authorization:'Bearer '+TOKEN}:{})},body:b?JSON.stringify(b):undefined});
+  const j=await r.json().catch(()=>({}));
+  if(r.status===401&&TOKEN){TOKEN=null;me=null;try{sessionStorage.removeItem('tk')}catch(e){}render();throw new Error('Session expired. Please sign in again.')}
+  if(!r.ok)throw new Error(j.error||'Request failed');
+  return j;
+}
+async function refresh(){const br=S.branch;S=await api('GET','/state');S.branch=br;render()}
+async function act(m,p,b,ok){try{await api(m,p,b);await refresh();if(ok)toast(ok)}catch(e){toast(e.message,1)}}
+async function login(){
+  try{const j=await api('POST','/login',{userId:$('#lu').value,pin:$('#lp').value});TOKEN=j.token;try{sessionStorage.setItem('tk',TOKEN)}catch(e){}
+    me=j.user;if(me.b!=='All')S.branch=me.b;view=ROLES[me.role][0];note='';await refresh()}
+  catch(e){note=esc(e.message);render()}
+}
+function logout(){TOKEN=null;me=null;cart=[];MPS=null;try{sessionStorage.removeItem('tk')}catch(e){}render()}
+async function boot(){
+  try{PUB=await api('GET','/users-public');try{TOKEN=sessionStorage.getItem('tk')}catch(e){}
+    if(TOKEN){me=await api('GET','/me');if(me.b!=='All')S.branch=me.b;await refresh()}else render()}
+  catch(e){TOKEN=null;me=null;render()}
+}
+setInterval(()=>{if(TOKEN&&['dash','customers','audit'].includes(view))refresh().catch(()=>{})},20000);
+
+/* ---------- Actions ---------- */
+function saveFile(name,data){
+  const bl=new Blob([data],{type:name.endsWith('.pdf')?'application/pdf':'text/plain'}),a=document.createElement('a');
+  a.href=URL.createObjectURL(bl);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+function receipt(s){
+  return 'ONPOINT TECH HUB - '+s.b+'\n'+s.id+'  '+new Date(s.t).toLocaleString()+'\n--------------------------\n'+s.items.map(c=>c.n+'\n  '+c.q+' x '+c.p+' = '+c.p*c.q).join('\n')+(s.disc?'\nDiscount -'+fmt(s.disc):'')+'\n--------------------------\nTOTAL '+fmt(s.total)+'\nVAT 16% incl. '+fmt(s.total-s.total/1.16)+'\nPaid by '+s.pay+(s.ref?' ('+s.ref+')':'')+'\nServed by '+s.by+'\nThank you!';
+}
+async function done(){
+  if(!cart.length)return;
+  try{
+    const s=await api('POST','/sales',{branch:B(),items:cart.map(c=>({k:c.k,q:c.q})),pay,disc,ref,cust,checkoutId:mp.status==='success'?mp.id:undefined});
+    last=receipt(s);lastId=s.id;cart=[];cust='';disc=0;ref='';mp={id:'',msg:'',status:''};await refresh();toast('Sale '+s.id+' saved');
+  }catch(e){toast(e.message,1)}
+}
+async function stk2(total){
+  if(!cust){toast('Enter the customer phone number first.',1);return}
+  try{const j=await api('POST','/mpesa/stkpush',{phone:cust,amount:total,branch:B()});mp={id:j.checkoutId,status:'pending',msg:'Prompt sent. Waiting for the customer to enter their PIN...'};render();poll(j.checkoutId)}
+  catch(e){toast(e.message,1)}
+}
+async function poll(id,n=0){
+  if(mp.id!==id)return;
+  try{const t=await api('GET','/mpesa/tx/'+id);
+    if(t.status==='success'){mp.status='success';ref=t.receipt;mp.msg='Paid KES '+t.amount+'. Code '+t.receipt+'.';return render()}
+    if(t.status==='failed'){mp.status='failed';mp.msg='Not completed: '+t.desc;return render()}
+  }catch(e){}
+  if(n>40){mp.msg='No response yet. Ask the customer, or enter the M-Pesa code by hand.';return render()}
+  setTimeout(()=>poll(id,n+1),3000);
+}
+const rf=id=>act('POST','/gas/refill-empties',{branch:B(),id});
+const gasAdd=(id,n)=>act('POST','/gas/stock',{branch:B(),id,full:n});
+const tankAdd=kg=>act('POST','/gas/tank',{branch:B(),kg});
+const setRate=v=>act('PUT','/gas/rate',{rate:+v||0});
+const stk=(id,d)=>act('POST','/products/'+id+'/stock',{branch:B(),delta:d});
+const settle=no=>act('POST','/sales/'+no+'/settle');
+const priceSet=(id,v)=>act('PUT','/services/'+id,{price:+v||0});
+const adv=id=>act('POST','/repairs/'+id+'/advance');
+const setPin=id=>act('PUT','/users/'+id+'/pin',{pin:$('#pin'+id).value},'PIN updated');
+function addP(){const n=$('#pn').value.trim();if(!n)return;act('POST','/products',{branch:B(),name:n,cost:+$('#pc').value||0,price:+$('#pp').value||0,qty:+$('#ps').value||0})}
+function addS(){const n=$('#sn').value.trim();if(!n)return;act('POST','/services',{name:n,price:+$('#sp').value||0})}
+function addX(){const a=+$('#x_a').value;if(!a)return;act('POST','/expenses',{branch:B(),c:$('#x_c').value,n:$('#x_n').value,amt:a})}
+function xfer(){act('POST','/transfer',{from:B(),to:$('#t_to').value,id:$('#t_p').value,qty:+$('#t_q').value},'Stock moved')}
+function addR(){
+  const v=id=>$('#'+id).value.trim();
+  if(!v('j_c')||!v('j_p')||!v('j_m')||!v('j_f')){toast('Enter the customer name, phone, brand and model, and the reported fault.',1);return}
+  act('POST','/repairs',{branch:B(),cust:v('j_c'),phone:v('j_p'),idno:v('j_id'),type:$('#j_t').value,device:v('j_m'),serial:v('j_s'),colour:v('j_col'),issue:v('j_f'),cond:v('j_cond'),acc:[...document.querySelectorAll('.j_a:checked')].map(x=>x.value),pw:v('j_pw'),est:+v('j_e')||0,dep:+v('j_d')||0,due:v('j_dt'),tech:v('j_tech')},'Job card saved. Download the shop and client copies from the list below.');
+}
+
+/* ---------- Settings: M-Pesa Daraja keys (Owner) ---------- */
+async function loadMp(){try{MPS=await api('GET','/settings/mpesa');render()}catch(e){toast(e.message,1)}}
+function settings(){
+  if(!MPS){loadMp();return '<div class="card">Loading settings...</div>'}
+  const f=(id,l,t,ph,v)=>`<label class="mut">${l}<input id="${id}" type="${t}" placeholder="${esc(ph||'')}" value="${esc(v||'')}" style="display:block;width:100%;margin-top:4px" autocomplete="off"></label>`;
+  const sel=(id,l,opts,cur)=>`<label class="mut">${l}<select id="${id}" style="display:block;width:100%;margin-top:4px">${opts.map(o=>`<option value="${o[0]}" ${o[0]===cur?'selected':''}>${o[1]}</option>`).join('')}</select></label>`;
+  return `<div class="card"><h3>M-Pesa Daraja (STK Push)</h3>
+  <div class="mut">Get these from developer.safaricom.co.ke. Secrets are encrypted on the server and are never shown again. Leave a secret box empty to keep the saved one.</div>
+  <div class="grid" style="margin-top:12px">
+  ${sel('m_env','Environment',[['sandbox','Sandbox (testing)'],['production','Production (real money)']],MPS.env)}
+  ${sel('m_tt','Transaction type',[['CustomerPayBillOnline','Paybill'],['CustomerBuyGoodsOnline','Till (Buy Goods)']],MPS.txType)}
+  ${f('m_ck','Consumer key','text',MPS.hasKey?'Saved ('+MPS.keyHint+'). Type to replace':'')}
+  ${f('m_cs','Consumer secret','password',MPS.hasSecret?'Saved (hidden). Type to replace':'')}
+  ${f('m_sc','Business shortcode (Paybill or Store number)','text','',MPS.shortcode)}
+  ${f('m_pk','Lipa na M-Pesa passkey','password',MPS.hasPasskey?'Saved (hidden). Type to replace':'')}
+  ${f('m_pb','Till number (Buy Goods only, if different)','text','',MPS.partyB)}
+  ${f('m_ar','Account reference','text','OnPoint',MPS.accountRef)}</div>
+  <div class="row" style="margin-top:12px"><button class="btn" onclick="saveMp()">Save keys</button><button class="btn sec" onclick="testMp()">Test connection</button><span class="mut">Status: ${MPS.configured?'keys saved ('+MPS.env+')':'not configured yet'}</span></div></div>
+  <div class="card" style="margin-top:12px"><h3>Callback URL</h3><div class="mut">Safaricom sends payment confirmations here. It is generated for you. Register it as the callback when you take your Daraja app live.</div><div class="rcpt" style="user-select:all;word-break:break-all">${esc(MPS.callbackUrl)}</div></div>`;
+}
+async function saveMp(){
+  const g=id=>$('#'+id).value;
+  try{await api('PUT','/settings/mpesa',{env:g('m_env'),txType:g('m_tt'),consumerKey:g('m_ck'),consumerSecret:g('m_cs'),shortcode:g('m_sc'),passkey:g('m_pk'),partyB:g('m_pb'),accountRef:g('m_ar')});MPS=null;toast('M-Pesa settings saved');loadMp()}
+  catch(e){toast(e.message,1)}
+}
+async function testMp(){try{await api('POST','/mpesa/test');toast('Connected to Daraja. Your keys work.')}catch(e){toast(e.message,1)}}
+boot();
+</script>
+</body>
+</html>

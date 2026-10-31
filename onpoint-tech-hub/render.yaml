@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: onpoint-tech-hub
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    healthCheckPath: /healthz
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: onpoint-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: OWNER_PIN
+        sync: false
+databases:
+  - name: onpoint-db
+    plan: basic-256mb
